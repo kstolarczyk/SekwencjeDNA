@@ -11,6 +11,9 @@ namespace Bioinformatyka
     {
         static void Main(string[] args)
         {
+            Instancja inst = new Instancja("test.txt", 4);
+            Console.WriteLine(inst);
+            Console.ReadKey();
         }
     }
 }
