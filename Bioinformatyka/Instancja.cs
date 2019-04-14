@@ -7,7 +7,7 @@ namespace Bioinformatyka
 {
     class Instancja
     {
-        public HashSet<string> Spectrum;
+        public HashSet<string> Spectrum { get; set; }
         private string Sekwencja;
         private Random Rnd = new Random();
         public Instancja(string FileName, int Dlugosc)
