@@ -1,58 +1,73 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Bioinformatyka
 {
-    class Graf
+    internal class Pokrycie
+    {
+        public byte len { get; set; } // dlugosc pokrycia
+        public string diff { get; set; } // niepokrywjaca sie czesc
+        public double f { get; set; } // feromony
+        public double p { get; set; }
+        public string id { get; set; }
+        public Pokrycie(byte l, string d, string v)
+        {
+            len = l;
+            diff = d;
+            f = 0.5f;
+            p = 0;
+            id = v;
+        }
+    }
+
+    internal class Graf
     {
         public string[] Vertices { get; set; }
-        public Dictionary<string, Dictionary<string, byte>> Connections { get; set; }
-
-        public byte Przesuniecie(string Source, string Target)
+        public Dictionary<string, Dictionary<string, Pokrycie>> Connections { get; set; }
+        public int BestResult { get; set; }
+        public readonly object BRLock = new object();
+        
+        public Pokrycie Przesuniecie(string Source, string Target)
         {
             byte end = (byte)Target.Length;
             byte max = end;
-            while(Source.Substring(end - max, max) != Target.Substring(0, max))
+            while (Source.Substring(end - max, max) != Target.Substring(0, max))
             {
                 if (max-- == 0) break;
             }
-            return max;
+            return new Pokrycie(max, Target.Substring(max, end - max), Target);
         }
 
         public void CountConnections(string Source, string[] Targets)
         {
-            foreach(string Target in Targets)
+            foreach (string Target in Targets)
             {
-                if(Target != Source)
+                if (Target != Source)
                 {
-                    this.Connections[Source].Add(Target, this.Przesuniecie(Source, Target));
+                    Connections[Source].Add(Target, Przesuniecie(Source, Target));
                 }
             }
         }
 
         public Graf(string[] Spectrum)
         {
-            this.Vertices = Spectrum;
+            Vertices = Spectrum;
             int Len = Spectrum.Length;
-            this.Connections = new Dictionary<string, Dictionary<string, byte>>(Len);
-            foreach(string OliNuk in Spectrum)
+            Connections = new Dictionary<string, Dictionary<string, Pokrycie>>(Len);
+            foreach (string OliNuk in Spectrum)
             {
-                this.Connections.Add(OliNuk, new Dictionary<string, byte>(Len));
-                this.CountConnections(OliNuk, Spectrum);
+                Connections.Add(OliNuk, new Dictionary<string, Pokrycie>(Len));
+                CountConnections(OliNuk, Spectrum);
             }
         }
 
         public override string ToString()
         {
             string print = "";
-            foreach(string S in this.Vertices)
+            foreach (string S in Vertices)
             {
-                foreach(var pair in this.Connections[S])
+                foreach (var pair in Connections[S])
                 {
-                    print += S + " -> " + pair.Key + " przesunięcie: " + pair.Value + "\n";
+                    print += S + " -> " + pair.Key + " przesunięcie: " + pair.Value.len + "\n";
                 }
             }
             return print;
