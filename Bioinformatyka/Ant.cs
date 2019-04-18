@@ -12,7 +12,7 @@ namespace Bioinformatyka
         private double powtorzenia; // szansa na powtorzenie oligonukleotydu w sekwencji
         private List<string> trasa;
         private Dictionary<string, bool> visited;
-        private Random rnd;
+
         public Ant(Graf G, int dlugoscSekwencji, int dlugoscOligo, string wierzchStart, double powtorzenia)
         {
             this.graf = G;
@@ -26,8 +26,8 @@ namespace Bioinformatyka
             {
                 this.visited.Add(v, false);
             }
-            this.rnd = new Random();
         }
+        
 
         public double[] Probabilty(string curr, Pokrycie[] somsiedzi)
         {
@@ -50,6 +50,14 @@ namespace Bioinformatyka
             return prob;
         }
 
+        public void resetVisited()
+        {
+            foreach(var key in new List<string>(this.visited.Keys))
+            {
+                this.visited[key] = false;
+            }
+        }
+
         public void updateFeromons(int count)
         {
             double feromon = Config.QF * graf.BestResult / count;
@@ -58,27 +66,27 @@ namespace Bioinformatyka
                 var elem = graf.Connections[this.trasa[i]][this.trasa[i + 1]];
                 lock(elem)
                 {
-                    elem.f = feromon / (this.trasa.Count - 1);
+                    elem.f = feromon * elem.len / Config.OLIGONUKLEOTYD_LEN;
                 }
             }
         }
 
         public void Run()
-        {
-            string result = start;
-            string curr = start;
-            this.visited[curr] = true;
-            this.trasa[0] = start;
-            int curLen = this.len;
-            int count = 1;
+        {         
             Pokrycie[] somsiedzi = new Pokrycie[graf.Vertices.Length - 1];
             while (true)
             {
+                string result = start;
+                string curr = start;
+                int curLen = this.len;
+                int count = 1;
+                this.visited[curr] = true;
+                this.trasa.Add(start);
                 while (curLen < this.n)
                 {
                     graf.Connections[curr].Values.CopyTo(somsiedzi, 0);
                     double[] p = this.Probabilty(curr, somsiedzi);
-                    double r = rnd.NextDouble();
+                    double r = RandomGen.NextDouble();
                     int left = 0, k;
                     int right = somsiedzi.Length;
                     while (true)
@@ -99,25 +107,38 @@ namespace Bioinformatyka
                     curLen += this.len - somsiedzi[k].len;
                     curr = somsiedzi[k].id;
                     this.visited[curr] = true;
-                    this.trasa[count++] = curr;
+                    this.trasa.Add(curr);
+                    count++;
 
                 }
-
-                if (count > graf.BestResult)
-                {
-                    lock (graf.BRLock)
+                if(curLen == this.n) {
+                    if(count > graf.BestResult)
                     {
-                        graf.BestResult = count;
+                        lock(graf.BRLock)
+                        {
+                            graf.Results.Clear();
+                        }
+                        Console.WriteLine("Best result: {0} vertices", count);
                     }
-                    Console.WriteLine(result);
-                    Console.WriteLine(count);
+                    if (count >= graf.BestResult)
+                    {
+
+                        if (!graf.Results.Contains(result))
+                        {
+                            lock (graf.BRLock)
+                            {
+                                graf.BestResult = count;
+                                graf.Results.Add(result);
+                            }
+                        }
+                    }
+
+                    this.updateFeromons(count);
                 }
 
-                this.updateFeromons(count);
-
-                count = 1;
-                result = start;
-                curLen = this.len;
+                
+                this.trasa.Clear();
+                this.resetVisited();
             }
         }
     }

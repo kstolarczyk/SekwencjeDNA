@@ -66,6 +66,7 @@
     <Compile Include="Instancja.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RandomGen.cs" />
     <Compile Include="SpecialAnt.cs" />
   </ItemGroup>
   <ItemGroup>

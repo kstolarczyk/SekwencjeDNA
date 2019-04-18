@@ -25,6 +25,7 @@ namespace Bioinformatyka
         public Dictionary<string, Dictionary<string, Pokrycie>> Connections { get; set; }
         public int BestResult { get; set; }
         public readonly object BRLock = new object();
+        public List<string> Results { get; set; }
         
         public Pokrycie Przesuniecie(string Source, string Target)
         {
@@ -52,6 +53,7 @@ namespace Bioinformatyka
         {
             Vertices = Spectrum;
             int Len = Spectrum.Length;
+            Results = new List<string>();
             Connections = new Dictionary<string, Dictionary<string, Pokrycie>>(Len);
             foreach (string OliNuk in Spectrum)
             {
