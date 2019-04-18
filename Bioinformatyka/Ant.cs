@@ -22,26 +22,30 @@ namespace Bioinformatyka
             this.powtorzenia = powtorzenia;
             this.visited = new Dictionary<string, bool>(graf.Vertices.Length);
             this.trasa = new List<string>(this.n - this.len + 1);
-            foreach(var v in graf.Vertices)
+            foreach (var v in graf.Vertices)
             {
                 this.visited.Add(v, false);
             }
         }
-        
+
 
         public double[] Probabilty(string curr, Pokrycie[] somsiedzi)
         {
             int length = somsiedzi.Length;
             double[] prob = new double[length];
             double sum = 0.0;
-            for(int i = 0; i < length; i++)
-            {    
+            for (int i = 0; i < length; i++)
+            {
                 prob[i] = Math.Pow(somsiedzi[i].f, Config.ALFA) * Math.Pow(somsiedzi[i].len, Config.BETA);
-                if (visited[somsiedzi[i].id]) prob[i] *= this.powtorzenia;
+                if (visited[somsiedzi[i].id])
+                {
+                    prob[i] *= this.powtorzenia;
+                }
+
                 sum += prob[i];
             }
             prob[0] /= sum;
-            for(int i = 1; i < length; i++)
+            for (int i = 1; i < length; i++)
             {
                 prob[i] /= sum;
                 prob[i] += prob[i - 1];
@@ -52,7 +56,7 @@ namespace Bioinformatyka
 
         public void resetVisited()
         {
-            foreach(var key in new List<string>(this.visited.Keys))
+            foreach (var key in new List<string>(this.visited.Keys))
             {
                 this.visited[key] = false;
             }
@@ -61,10 +65,10 @@ namespace Bioinformatyka
         public void updateFeromons(int count)
         {
             double feromon = Config.QF * graf.BestResult / count;
-            for(int i = 0; i < this.trasa.Count - 1; i++)
+            for (int i = 0; i < this.trasa.Count - 1; i++)
             {
                 var elem = graf.Connections[this.trasa[i]][this.trasa[i + 1]];
-                lock(elem)
+                lock (elem)
                 {
                     elem.f = feromon * elem.len / Config.OLIGONUKLEOTYD_LEN;
                 }
@@ -72,7 +76,8 @@ namespace Bioinformatyka
         }
 
         public void Run()
-        {         
+        {
+            Program.barrier.SignalAndWait();
             Pokrycie[] somsiedzi = new Pokrycie[graf.Vertices.Length - 1];
             while (true)
             {
@@ -94,7 +99,11 @@ namespace Bioinformatyka
                         k = (left + right) / 2;
                         if (r <= p[k])
                         {
-                            if (k == left) break;
+                            if (k == left)
+                            {
+                                break;
+                            }
+
                             right = k;
                         }
                         else
@@ -111,10 +120,11 @@ namespace Bioinformatyka
                     count++;
 
                 }
-                if(curLen == this.n) {
-                    if(count > graf.BestResult)
+                if (curLen == this.n)
+                {
+                    if (count > graf.BestResult)
                     {
-                        lock(graf.BRLock)
+                        lock (graf.BRLock)
                         {
                             graf.Results.Clear();
                         }
@@ -136,7 +146,7 @@ namespace Bioinformatyka
                     this.updateFeromons(count);
                 }
 
-                
+
                 this.trasa.Clear();
                 this.resetVisited();
             }

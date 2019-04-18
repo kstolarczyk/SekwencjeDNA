@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Bioinformatyka
+﻿namespace Bioinformatyka
 {
     class Config
     {
@@ -14,7 +8,8 @@ namespace Bioinformatyka
         public static readonly double QF = 50; // bazowa ilość rozprowadzanego feromonu
         public static readonly string FILE_NAME = "test.txt"; // nazwa pliku instancji
         public static readonly double PAROWANIE = 0.5;
-        public static readonly int LICZBA_MROWEK = 50;
+        public static readonly int LICZBA_MROWEK = 30;
         public static readonly int MAX_TIMEOUT = 30000; // max working time in miliseconds
+        public static readonly double POWTORZENIA = 0.05; // szansa na powtorzenie
     }
 }

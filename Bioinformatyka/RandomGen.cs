@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Bioinformatyka
 {
@@ -18,7 +14,11 @@ namespace Bioinformatyka
             if (inst == null)
             {
                 int seed;
-                lock (_global) seed = _global.Next();
+                lock (_global)
+                {
+                    seed = _global.Next();
+                }
+
                 _local = inst = new Random(seed);
             }
             return inst.Next(max);
@@ -30,7 +30,11 @@ namespace Bioinformatyka
             if (inst == null)
             {
                 int seed;
-                lock (_global) seed = _global.Next();
+                lock (_global)
+                {
+                    seed = _global.Next();
+                }
+
                 _local = inst = new Random(seed);
             }
             return inst.Next(min, max);
@@ -42,7 +46,11 @@ namespace Bioinformatyka
             if (inst == null)
             {
                 int seed;
-                lock (_global) seed = _global.Next();
+                lock (_global)
+                {
+                    seed = _global.Next();
+                }
+
                 _local = inst = new Random(seed);
             }
             return inst.Next();
@@ -56,7 +64,11 @@ namespace Bioinformatyka
             if (inst == null)
             {
                 int seed;
-                lock (_global) seed = _global.Next();
+                lock (_global)
+                {
+                    seed = _global.Next();
+                }
+
                 _local = inst = new Random(seed);
             }
             return inst.NextDouble();

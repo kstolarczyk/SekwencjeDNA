@@ -6,6 +6,7 @@ namespace Bioinformatyka
 {
     internal class Program
     {
+        public static Barrier barrier = new Barrier(Config.LICZBA_MROWEK);
         private static void Main(string[] args)
         {
             try
@@ -16,23 +17,28 @@ namespace Bioinformatyka
                 Ant[] Ants = new Ant[Config.LICZBA_MROWEK - 1];
                 for (int i = 0; i < Ants.Length; i++)
                 {
-                    Ants[i] = new Ant(graf, inst.dlugoscSekwencji, Config.OLIGONUKLEOTYD_LEN, inst.start, 0.05);
+                    Ants[i] = new Ant(graf, inst.dlugoscSekwencji, Config.OLIGONUKLEOTYD_LEN, inst.start, Config.POWTORZENIA);
                     threads[i] = new Thread(new ThreadStart(Ants[i].Run));
                 }
-                SpecialAnt main = new SpecialAnt(graf, inst.dlugoscSekwencji, Config.OLIGONUKLEOTYD_LEN, inst.start, 0.05);
+                SpecialAnt main = new SpecialAnt(graf, inst.dlugoscSekwencji, Config.OLIGONUKLEOTYD_LEN, inst.start, Config.POWTORZENIA);
                 threads[Config.LICZBA_MROWEK - 1] = new Thread(new ThreadStart(main.Run));
+                Thread.CurrentThread.Priority = ThreadPriority.Highest;
                 //Console.WriteLine(graf);
                 for (int i = 0; i < threads.Length; i++)
                 {
+                    threads[i].Priority = ThreadPriority.Highest;
                     threads[i].Start();
-                    threads[i].Join(1);
+                }
+                for (int i = 0; i < threads.Length; i++)
+                {
+                    //threads[i].Join(1);
                 }
                 Thread.Sleep(Config.MAX_TIMEOUT);
-                for(int i = 0; i < threads.Length; i++)
+                for (int i = 0; i < threads.Length; i++)
                 {
                     threads[i].Abort();
                 }
-                foreach(string result in graf.Results)
+                foreach (string result in graf.Results)
                 {
                     Console.WriteLine(result);
                 }

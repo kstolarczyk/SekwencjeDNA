@@ -26,14 +26,17 @@ namespace Bioinformatyka
         public int BestResult { get; set; }
         public readonly object BRLock = new object();
         public List<string> Results { get; set; }
-        
+
         public Pokrycie Przesuniecie(string Source, string Target)
         {
             byte end = (byte)Target.Length;
             byte max = end;
             while (Source.Substring(end - max, max) != Target.Substring(0, max))
             {
-                if (max-- == 0) break;
+                if (max-- == 0)
+                {
+                    break;
+                }
             }
             return new Pokrycie(max, Target.Substring(max, end - max), Target);
         }
