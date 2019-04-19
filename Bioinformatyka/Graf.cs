@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 
 namespace Bioinformatyka
 {
@@ -25,7 +26,7 @@ namespace Bioinformatyka
         public Dictionary<string, Dictionary<string, Pokrycie>> Connections { get; set; }
         public int BestResult { get; set; }
         public readonly object BRLock = new object();
-        public List<string> Results { get; set; }
+        public Dictionary<string, bool> Results { get; set; }
 
         public Pokrycie Przesuniecie(string Source, string Target)
         {
@@ -56,7 +57,7 @@ namespace Bioinformatyka
         {
             Vertices = Spectrum;
             int Len = Spectrum.Length;
-            Results = new List<string>();
+            Results = new Dictionary<string, bool>(1024);
             Connections = new Dictionary<string, Dictionary<string, Pokrycie>>(Len);
             foreach (string OliNuk in Spectrum)
             {
@@ -67,15 +68,15 @@ namespace Bioinformatyka
 
         public override string ToString()
         {
-            string print = "";
+            StringBuilder print = new StringBuilder("");
             foreach (string S in Vertices)
             {
                 foreach (var pair in Connections[S])
                 {
-                    print += S + " -> " + pair.Key + " przesunięcie: " + pair.Value.len + "\n";
+                    print.Append(S).Append(" -> ").Append(pair.Key).Append(" przesunięcie: ").Append(pair.Value.len).Append("\n");
                 }
             }
-            return print;
+            return print.ToString();
         }
     }
 }

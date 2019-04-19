@@ -9,7 +9,7 @@
         public static readonly string FILE_NAME = "test.txt"; // nazwa pliku instancji
         public static readonly double PAROWANIE = 0.5;
         public static readonly int LICZBA_MROWEK = 30;
-        public static readonly int MAX_TIMEOUT = 30000; // max working time in miliseconds
+        public static readonly int MAX_TIMEOUT = 60000; // max working time in miliseconds
         public static readonly double POWTORZENIA = 0.05; // szansa na powtorzenie
     }
 }

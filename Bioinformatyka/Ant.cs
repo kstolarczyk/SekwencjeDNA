@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Bioinformatyka
 {
@@ -10,9 +11,8 @@ namespace Bioinformatyka
         private int len; // dlugosc oligonukleotydu
         private string start; // wierzcholek startowy
         private double powtorzenia; // szansa na powtorzenie oligonukleotydu w sekwencji
-        private List<string> trasa;
         private Dictionary<string, bool> visited;
-
+        private List<string> trasa;
         public Ant(Graf G, int dlugoscSekwencji, int dlugoscOligo, string wierzchStart, double powtorzenia)
         {
             this.graf = G;
@@ -20,8 +20,8 @@ namespace Bioinformatyka
             this.len = dlugoscOligo;
             this.start = wierzchStart;
             this.powtorzenia = powtorzenia;
-            this.visited = new Dictionary<string, bool>(graf.Vertices.Length);
             this.trasa = new List<string>(this.n - this.len + 1);
+            this.visited = new Dictionary<string, bool>(graf.Vertices.Length);
             foreach (var v in graf.Vertices)
             {
                 this.visited.Add(v, false);
@@ -56,7 +56,7 @@ namespace Bioinformatyka
 
         public void resetVisited()
         {
-            foreach (var key in new List<string>(this.visited.Keys))
+            foreach (var key in graf.Vertices)
             {
                 this.visited[key] = false;
             }
@@ -77,12 +77,14 @@ namespace Bioinformatyka
 
         public void Run()
         {
-            Program.barrier.SignalAndWait();
+
             Pokrycie[] somsiedzi = new Pokrycie[graf.Vertices.Length - 1];
+            Program.barrier.SignalAndWait();
+            StringBuilder result = new StringBuilder(this.start, this.n - this.len + 1);
+
             while (true)
             {
-                string result = start;
-                string curr = start;
+                string curr = this.start;
                 int curLen = this.len;
                 int count = 1;
                 this.visited[curr] = true;
@@ -112,11 +114,11 @@ namespace Bioinformatyka
                             left = k;
                         }
                     }
-                    result += somsiedzi[k].diff;
+                    result.Append(somsiedzi[k].diff);
                     curLen += this.len - somsiedzi[k].len;
                     curr = somsiedzi[k].id;
-                    this.visited[curr] = true;
                     this.trasa.Add(curr);
+                    this.visited[curr] = true;
                     count++;
 
                 }
@@ -127,18 +129,18 @@ namespace Bioinformatyka
                         lock (graf.BRLock)
                         {
                             graf.Results.Clear();
+                            graf.BestResult = count;
                         }
                         Console.WriteLine("Best result: {0} vertices", count);
                     }
                     if (count >= graf.BestResult)
                     {
-
-                        if (!graf.Results.Contains(result))
+                        string res = result.ToString();
+                        if (!graf.Results.ContainsKey(res))
                         {
                             lock (graf.BRLock)
                             {
-                                graf.BestResult = count;
-                                graf.Results.Add(result);
+                                graf.Results.Add(res,true);
                             }
                         }
                     }
@@ -146,9 +148,9 @@ namespace Bioinformatyka
                     this.updateFeromons(count);
                 }
 
-
-                this.trasa.Clear();
                 this.resetVisited();
+                this.trasa.Clear();
+                result.Clear();
             }
         }
     }

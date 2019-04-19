@@ -26,7 +26,7 @@ namespace Bioinformatyka
                 //Console.WriteLine(graf);
                 for (int i = 0; i < threads.Length; i++)
                 {
-                    threads[i].Priority = ThreadPriority.Highest;
+                    threads[i].Priority = ThreadPriority.AboveNormal;
                     threads[i].Start();
                 }
                 for (int i = 0; i < threads.Length; i++)
@@ -38,9 +38,9 @@ namespace Bioinformatyka
                 {
                     threads[i].Abort();
                 }
-                foreach (string result in graf.Results)
+                foreach (string result in graf.Results.Keys)
                 {
-                    Console.WriteLine(result);
+                    Console.WriteLine("result: {0} with matching score: {1}%", result, SequenceAlignment.Score(inst.Sekwencja, result)*100);
                 }
                 Console.WriteLine("{0} number of results with {1} vertices", graf.Results.Count, graf.BestResult);
             }
