@@ -29,10 +29,7 @@ namespace Bioinformatyka
                     threads[i].Priority = ThreadPriority.AboveNormal;
                     threads[i].Start();
                 }
-                for (int i = 0; i < threads.Length; i++)
-                {
-                    //threads[i].Join(1);
-                }
+
                 Thread.Sleep(Config.MAX_TIMEOUT);
                 for (int i = 0; i < threads.Length; i++)
                 {

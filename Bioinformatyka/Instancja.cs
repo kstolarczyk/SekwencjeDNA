@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Bioinformatyka
 {
@@ -33,10 +34,38 @@ namespace Bioinformatyka
             for (int i = 0; i <= Sekwencja.Length - Dlugosc; i++)
             {
                 Spectrum.Add(Sekwencja.Substring(i, Dlugosc));
+                if(Config.POZYTYWNE > 0 && Rnd.NextDouble() < Config.POZYTYWNE)
+                {
+                    Spectrum.Add(this.GenerujOligo(Dlugosc));
+                }
             }
             this.start = Spectrum.First();
             Spectrum = new HashSet<string>(Shuffle());
 
+        }
+
+        private string GenerujOligo(int dlugosc)
+        {
+            double probA = Rnd.NextDouble();
+            double probT = Rnd.NextDouble();
+            double probG = Rnd.NextDouble();
+            double probC = Rnd.NextDouble();
+            double sum = probA + probT + probG + probC;
+            probA /= sum;
+            probT = probA + (probT / sum);
+            probG = probT + (probG / sum);
+            probC = probG + (probC / sum);
+            StringBuilder result = new StringBuilder(dlugosc);
+            for(int i = 0; i < dlugosc; i++)
+            {
+                double r = Rnd.NextDouble();
+                if (r <= probA) result.Append("A");
+                else if (r <= probT) result.Append("T");
+                else if (r <= probG) result.Append("G");
+                else result.Append("C");
+            }
+            Console.WriteLine("wygenerowano błąd pozytywny: {0}", result.ToString());
+            return result.ToString();
         }
 
         public void Swap(ref string a, ref string b)
