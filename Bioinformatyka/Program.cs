@@ -40,7 +40,7 @@ namespace Bioinformatyka
                 }
                 foreach (string result in graf.Results.Keys)
                 {
-                    Console.WriteLine("result: {0} with matching score: {1}%", result, SequenceAlignment.Score(inst.Sekwencja, result)*100);
+                    Console.WriteLine("result: {0}\nwith matching score: {1}%", result, SequenceAlignment.Score(inst.Sekwencja, result)*100);
                 }
                 Console.WriteLine("{0} number of results with {1} vertices", graf.Results.Count, graf.BestResult);
             }

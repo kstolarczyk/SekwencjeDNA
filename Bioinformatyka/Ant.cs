@@ -149,8 +149,8 @@ namespace Bioinformatyka
                 }
 
                 this.resetVisited();
-                this.trasa.Clear();
-                result.Clear();
+                this.trasa.Clear(); 
+                result.Clear().Append(start);
             }
         }
     }
