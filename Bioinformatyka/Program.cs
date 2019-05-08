@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -11,7 +12,98 @@ namespace Bioinformatyka
         {
             try
             {
-                Instancja inst = new Instancja(Config.FILE_NAME, Config.OLIGONUKLEOTYD_LEN);
+
+                // wybor opcji instancji
+
+                Console.WriteLine("Wczytywanie sekwencji -wybierz opcje (1-2):");
+                Console.WriteLine("1. Wczytaj instancję (sekwencje) z pliku");
+                Console.WriteLine("2. Wygeneruj losową sekwencje");
+
+                string sekwencja;
+                switch (Console.ReadKey().KeyChar)
+                {
+                    case '1':
+                        Console.Write("\nWpisz nazwę pliku instancji: ");
+                        string fileName = Console.ReadLine();
+                        StreamReader reader = new StreamReader(fileName);
+                        sekwencja = reader.ReadLine();
+                        break;
+                    case '2':
+                        Console.Write("\nWpisz rozmiar n sekwencji: ");
+                        uint n;
+                        if (!UInt32.TryParse(Console.ReadLine(), out n))
+                        {
+                            throw new Exception("\nWpisano niepoprawną wartość, program zostanie zamknięty");
+                        }
+                        sekwencja = Instancja.GenerujInstancje(n);
+                        break;
+                    default:
+                        throw new Exception("\nNie wybrano żadnej opcji, program zostanie zamknięty");
+
+                }
+
+                Console.WriteLine("\nKonfiguracja parametrów - wybierz opcje (1-2):");
+                Console.WriteLine("1. Konfiguruj parametry (długość oligonukleotydu - k, błędy negatywne - p1, błędy pozytywne - p2, czas wykonywania algorytmu - t)");
+                Console.WriteLine("2. Pomiń konfigurację (domyślne parametry: k = 10; p1 = 0.05; p2 = 0.02; t = 30;");
+
+                switch (Console.ReadKey().KeyChar)
+                {
+                    case '1':
+
+                        // pobranie dlugosci oligonukleotydu w spektrum
+
+                        uint k;
+                        Console.Write("\nWpisz długość k oligonukleotydu (8 <= k <= 10): ");
+
+                        if (!UInt32.TryParse(Console.ReadLine(), out k) || k < 8 || k > 10)
+                        {
+                            throw new Exception("\nWpisano niepoprawną wartość, program zostanie zamknięty");
+                        }
+
+                        Config.OLIGONUKLEOTYD_LEN = (byte)k;
+
+                        // pobranie informacji o możliwych błędach w spektrum
+
+                        double p;
+
+                        Console.Write("\nPodaj prawdopodobieństwo p1 wystąpienia błędu negatywnego (powtórzenia oligonukleotydu) w spektrum (0 <= p <= 1): ");
+                        if (!Double.TryParse(Console.ReadLine().Replace('.', ','), out p) || p < 0 || p > 1)
+                        {
+                            throw new Exception("\nWpisano niepoprawną wartość, program zostanie zamknięty");
+                        }
+                        Config.POWTORZENIA = p;
+
+
+                        Console.Write("\nPodaj prawdopodobieństwo p2 wystąpienia błędu pozytywnego (nadmiarowego oligonukleotydu) w spektrum (0 <= p <= 1): ");
+                        if (!Double.TryParse(Console.ReadLine().Replace('.', ','), out p) || p < 0 || p > 1)
+                        {
+                            throw new Exception("\nWpisano niepoprawną wartość, program zostanie zamknięty");
+                        }
+                        Config.POZYTYWNE = p;
+
+                        // Ustawienie przyblizonego czasu wykonywania algorytmu
+
+                        uint t;
+                        Console.Write("\nPodaj czas t wykonywania algorytmu w sekundach: ");
+                        if (!UInt32.TryParse(Console.ReadLine(), out t))
+                        {
+                            throw new Exception("\nWpisano niepoprawną wartość, program zostanie zamknięty");
+                        }
+
+                        Config.MAX_TIMEOUT = t * 1000;
+                        break;
+                    case '2':
+                        break;
+                    default:
+                        throw new Exception("\nNie wybrano żadnej opcji, program zostanie zamknięty");
+
+                }
+                Console.WriteLine("\n");
+
+                Instancja inst = new Instancja(sekwencja, Config.OLIGONUKLEOTYD_LEN); // utworzenie rzeczywistej instancji (spektrum oligonukleotydow w losowej kolejnosci)
+
+                Console.WriteLine("Trwa działanie algorytmu...");
+
                 Graf graf = new Graf(inst.Spectrum.ToArray());
                 Thread[] threads = new Thread[Config.LICZBA_MROWEK];
                 Ant[] Ants = new Ant[Config.LICZBA_MROWEK - 1];
@@ -30,14 +122,14 @@ namespace Bioinformatyka
                     threads[i].Start();
                 }
 
-                Thread.Sleep(Config.MAX_TIMEOUT);
+                Thread.Sleep((int)Config.MAX_TIMEOUT);
                 for (int i = 0; i < threads.Length; i++)
                 {
                     threads[i].Abort();
                 }
                 foreach (string result in graf.Results.Keys)
                 {
-                    Console.WriteLine("result: {0}\nwith matching score: {1}%", result, SequenceAlignment.Score(inst.Sekwencja, result)*100);
+                    Console.WriteLine("result: {0}\nwith matching score: {1}%", result, SequenceAlignment.Score(inst.Sekwencja, result) * 100);
                 }
                 Console.WriteLine("{0} number of results with {1} vertices", graf.Results.Count, graf.BestResult);
             }

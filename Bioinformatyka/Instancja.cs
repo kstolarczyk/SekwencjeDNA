@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -12,13 +11,48 @@ namespace Bioinformatyka
         public string Sekwencja { get; set; }
         public int dlugoscSekwencji;
         public string start;
-        private Random Rnd = new Random();
+        private static Random Rnd = new Random();
 
-        public Instancja(string FileName, int Dlugosc)
+        public static string GenerujInstancje(uint n) // n - dlugosc sekwencji
         {
-            StreamReader reader = new StreamReader(FileName);
+            StringBuilder inst = new StringBuilder("", (int)n);
+            double probA = Rnd.NextDouble();
+            double probT = Rnd.NextDouble();
+            double probG = Rnd.NextDouble();
+            double probC = Rnd.NextDouble();
+            double sum = probA + probT + probG + probC;
+            probA /= sum;
+            probT = probA + (probT / sum);
+            probG = probT + (probG / sum);
+            probC = probG + (probC / sum);
+            for (int i = 0; i < n; i++)
+            {
+                double r = Rnd.NextDouble();
+                if (r <= probA) inst.Append("A");
+                else if (r <= probT) inst.Append("T");
+                else if (r <= probG) inst.Append("G");
+                else inst.Append("C");
+            }
+            return inst.ToString();
+        }
+
+        public static double Powtorzenia(string instancja, int k)
+        {
+            HashSet<string> oligo = new HashSet<string>();
+            for (int i = 0; i < instancja.Length - k; i++)
+            {
+                oligo.Add(instancja.Substring(i, k));
+            }
+            int max = instancja.Length - k + 1;
+
+            return (max - oligo.Count) / (double)max;
+        }
+
+
+        public Instancja(string sequence, int Dlugosc)
+        {
             Spectrum = new HashSet<string>();
-            Sekwencja = reader.ReadLine();
+            Sekwencja = sequence;
             this.dlugoscSekwencji = Sekwencja.Length;
             if (!Sekwencja.All((character) =>
              {
@@ -34,7 +68,7 @@ namespace Bioinformatyka
             for (int i = 0; i <= Sekwencja.Length - Dlugosc; i++)
             {
                 Spectrum.Add(Sekwencja.Substring(i, Dlugosc));
-                if(Config.POZYTYWNE > 0 && Rnd.NextDouble() < Config.POZYTYWNE)
+                if (Config.POZYTYWNE > 0 && Rnd.NextDouble() < Config.POZYTYWNE)
                 {
                     Spectrum.Add(this.GenerujOligo(Dlugosc));
                 }
@@ -56,7 +90,7 @@ namespace Bioinformatyka
             probG = probT + (probG / sum);
             probC = probG + (probC / sum);
             StringBuilder result = new StringBuilder(dlugosc);
-            for(int i = 0; i < dlugosc; i++)
+            for (int i = 0; i < dlugosc; i++)
             {
                 double r = Rnd.NextDouble();
                 if (r <= probA) result.Append("A");
