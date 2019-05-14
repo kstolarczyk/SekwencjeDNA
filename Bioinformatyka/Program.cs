@@ -14,12 +14,15 @@ namespace Bioinformatyka
             {
 
                 // wybor opcji instancji
-
+              
                 Console.WriteLine("Wczytywanie sekwencji -wybierz opcje (1-2):");
                 Console.WriteLine("1. Wczytaj instancję (sekwencje) z pliku");
-                Console.WriteLine("2. Wygeneruj losową sekwencje");
+                Console.WriteLine("2. Wygeneruj losową sekwencje (stałe losowe prawdopodobieństwo nukleotydów)");
+                Console.WriteLine("3. Wygeneruj losową sekwencje (zmienne losowe prawdopobieństwo nukleotydów)");
+                Console.WriteLine("4. Wygeneruj losową sekwencje (stałe ręcznie wpisane prawdopodobieństwo nukleotydów)");
 
                 string sekwencja;
+                uint n;
                 switch (Console.ReadKey().KeyChar)
                 {
                     case '1':
@@ -30,12 +33,55 @@ namespace Bioinformatyka
                         break;
                     case '2':
                         Console.Write("\nWpisz rozmiar n sekwencji: ");
-                        uint n;
+                        
                         if (!UInt32.TryParse(Console.ReadLine(), out n))
                         {
                             throw new Exception("\nWpisano niepoprawną wartość, program zostanie zamknięty");
                         }
                         sekwencja = Instancja.GenerujInstancje(n);
+                        break;
+                    case '3':
+                        Console.Write("\nWpisz rozmiar n sekwencji: ");
+                        if (!UInt32.TryParse(Console.ReadLine(), out n))
+                        {
+                            throw new Exception("\nWpisano niepoprawną wartość, program zostanie zamknięty");
+                        }
+                        uint k;
+                        Console.Write("\nWpisz krok k zmienności prawdopodobieństwa: ");
+                        if (!UInt32.TryParse(Console.ReadLine(), out k))
+                        {
+                            throw new Exception("\nWpisano niepoprawną wartość, program zostanie zamknięty");
+                        }
+                        sekwencja = Instancja.GenerujInstancje(n,k);
+                        break;
+                    case '4':
+                        Console.Write("\nWpisz rozmiar n sekwencji: ");
+                        if (!UInt32.TryParse(Console.ReadLine(), out n))
+                        {
+                            throw new Exception("\nWpisano niepoprawną wartość, program zostanie zamknięty");
+                        }
+                        double A, C, G, T;
+                        Console.Write("\nWpisz prawdopodobieństwo dla A: ");
+                        if (!Double.TryParse(Console.ReadLine().Replace('.', ','), out A))
+                        {
+                            throw new Exception("\nWpisano niepoprawną wartość, program zostanie zamknięty");
+                        }
+                        Console.Write("\nWpisz prawdopodobieństwo dla C: ");
+                        if (!Double.TryParse(Console.ReadLine().Replace('.', ','), out C))
+                        {
+                            throw new Exception("\nWpisano niepoprawną wartość, program zostanie zamknięty");
+                        }
+                        Console.Write("\nWpisz prawdopodobieństwo dla G: ");
+                        if (!Double.TryParse(Console.ReadLine().Replace('.', ','), out G))
+                        {
+                            throw new Exception("\nWpisano niepoprawną wartość, program zostanie zamknięty");
+                        }
+                        Console.Write("\nWpisz prawdopodobieństwo dla T: ");
+                        if (!Double.TryParse(Console.ReadLine().Replace('.', ','), out T))
+                        {
+                            throw new Exception("\nWpisano niepoprawną wartość, program zostanie zamknięty");
+                        }
+                        sekwencja = Instancja.GenerujInstancje(n, A, C, G, T);
                         break;
                     default:
                         throw new Exception("\nNie wybrano żadnej opcji, program zostanie zamknięty");

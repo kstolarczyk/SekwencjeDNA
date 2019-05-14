@@ -13,7 +13,7 @@ namespace Bioinformatyka
         public string start;
         private static Random Rnd = new Random();
 
-        public static string GenerujInstancje(uint n) // n - dlugosc sekwencji
+        public static string GenerujInstancje(uint n) // n - dlugosc sekwencji;
         {
             StringBuilder inst = new StringBuilder("", (int)n);
             double probA = Rnd.NextDouble();
@@ -27,6 +27,64 @@ namespace Bioinformatyka
             probC = probG + (probC / sum);
             for (int i = 0; i < n; i++)
             {
+                double r = Rnd.NextDouble();
+                if (r <= probA) inst.Append("A");
+                else if (r <= probT) inst.Append("T");
+                else if (r <= probG) inst.Append("G");
+                else inst.Append("C");
+            }
+            return inst.ToString();
+        }
+
+        public static string GenerujInstancje(uint n, double probA, double probC, double probG, double probT) // n - dlugosc sekwencji; probA, probC, probG, probT - prawdopodobieństwo każdego nukleotydu
+        {
+            StringBuilder inst = new StringBuilder("", (int)n);
+
+            double sum = probA + probT + probG + probC;
+            probA /= sum;
+            probT = probA + (probT / sum);
+            probG = probT + (probG / sum);
+            probC = probG + (probC / sum);
+
+            for (int i = 0; i < n; i++)
+            {
+                double r = Rnd.NextDouble();
+                if (r <= probA) inst.Append("A");
+                else if (r <= probT) inst.Append("T");
+                else if (r <= probG) inst.Append("G");
+                else inst.Append("C");
+            }
+            return inst.ToString();
+        }
+
+        public static string GenerujInstancje(uint n, uint k) // n - dlugosc sekwencji; k - krok zmienności prawdopodobieństw
+        {
+            StringBuilder inst = new StringBuilder("", (int)n);
+            double probA = Rnd.NextDouble();
+            double probT = Rnd.NextDouble();
+            double probG = Rnd.NextDouble();
+            double probC = Rnd.NextDouble();
+
+            double sum = probA + probT + probG + probC;
+            probA /= sum;
+            probT = probA + (probT / sum);
+            probG = probT + (probG / sum);
+            probC = probG + (probC / sum);
+
+            for (int i = 0; i < n; i++)
+            {
+                if(i % k == k-1)
+                {
+                    probA = Rnd.NextDouble();
+                    probT = Rnd.NextDouble();
+                    probG = Rnd.NextDouble();
+                    probC = Rnd.NextDouble();
+                    sum = probA + probT + probG + probC;
+                    probA /= sum;
+                    probT = probA + (probT / sum);
+                    probG = probT + (probG / sum);
+                    probC = probG + (probC / sum);
+                }
                 double r = Rnd.NextDouble();
                 if (r <= probA) inst.Append("A");
                 else if (r <= probT) inst.Append("T");
