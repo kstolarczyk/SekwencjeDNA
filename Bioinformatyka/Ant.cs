@@ -124,23 +124,28 @@ namespace Bioinformatyka
                 }
                 if (curLen == this.n)
                 {
-                    if (count > graf.BestResult)
-                    {
-                        lock (graf.BRLock)
-                        {
-                            graf.Results.Clear();
-                            graf.BestResult = count;
-                        }
-                        Console.WriteLine("Best result: {0} vertices", count);
-                    }
                     if (count >= graf.BestResult)
                     {
+                        if (count > graf.BestResult)
+                        {
+                            lock (graf.BRLock)
+                            {
+                                if (count > graf.BestResult)
+                                {
+                                    graf.Results.Clear();
+                                    graf.BestResult = count;
+                                    Console.WriteLine("Best result: {0} vertices", count);
+
+                                }
+                            }
+                        }
                         string res = result.ToString();
                         if (!graf.Results.ContainsKey(res))
                         {
                             lock (graf.BRLock)
                             {
-                                graf.Results.Add(res,true);
+                                if (!graf.Results.ContainsKey(res))
+                                    graf.Results.Add(res,true);
                             }
                         }
                     }
